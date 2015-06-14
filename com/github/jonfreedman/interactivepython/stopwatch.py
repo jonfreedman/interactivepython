@@ -13,8 +13,10 @@ __author__ = 'jon'
 
 class Timer(object):
 
+    """Simple class to keep track of time."""
+
     def __init__(self, timer=None):
-        """Keeps track of time.
+        """Initialise timer to 0.
 
         :param timer: simplegui timer
         """

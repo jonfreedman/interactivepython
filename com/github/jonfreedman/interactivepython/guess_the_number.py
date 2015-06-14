@@ -15,25 +15,20 @@ class Game(object):
 
     """Holds the game state."""
 
-    def __init__(self):
-        """Instantiate a new game picking a random number in [0, 100)."""
-        self.set_config(100, 7)
-
-    def set_config(self, game_range, max_guesses):
-        """Set the game configuration and start a new game.
+    def __init__(self, game_range=100, max_guesses=7):
+        """Instantiate a new game picking a random number in [0, game_range).
 
         :param game_range: upper bound for number
-        :param max_guesses: maximum number of guesses allowed
-        """
+        :param max_guesses: maximum number of guesses allowed"""
         self.game_range = game_range
         self.max_guesses = max_guesses
-        self.reset()
-
-    def reset(self):
-        """Reset the game state, set guess_count to 0 and pick a new number."""
         self.guess_count = 0
         self.secret_number = random.randrange(0, self.game_range)
         print("Started a new game, guess in [0," + str(self.game_range) + ")")
+
+    def reset(self):
+        """Reset the game state keeping current range."""
+        self.__init__(self.game_range, self.max_guesses)
 
     def guess(self, guess):
         """Record a guess.
@@ -57,12 +52,12 @@ GAME = Game()
 # define event handlers for control panel
 def range100():
     """Start a new game using [0,100)."""
-    GAME.set_config(100, 7)
+    GAME.__init__(100, 7)
 
 
 def range1000():
     """Start a new game using [0,1000)."""
-    GAME.set_config(1000, 10)
+    GAME.__init__(1000, 10)
 
 
 def input_guess(guess):
