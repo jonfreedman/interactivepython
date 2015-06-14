@@ -28,8 +28,8 @@ font = "monospace"
 score_size = 24
 time_size = 36
 
-"""Convert time in tenths of a second into a formatted string A:BC.D"""
 def format(t):
+    """Convert time in tenths of a second into a formatted string A:BC.D"""
     mins = "%d" % (t // 600)
     secs = "%02d" % ((t // 10) % 60)
     tenths = "%d" % (t % 10)
@@ -58,8 +58,8 @@ def reset():
     stop()
     time = points = stops = 0
 
-"""event handler for timer"""
 def increment():
+    """event handler for timer"""
     global time, colour
     time += 1
     colour = "#%02X%02X%02X" % (colour_picker(), colour_picker(), colour_picker())
