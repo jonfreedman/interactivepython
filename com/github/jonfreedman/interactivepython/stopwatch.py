@@ -34,18 +34,18 @@ class Timer(object):
         self.stops = 0
         self.running = False
         self.colour = "#FFFFFF"
-        if not self.timer is None:
+        if self.timer is not None:
             self.timer.stop()
 
     def start(self):
         """Start timer."""
         self.running = True
-        if not self.timer is None:
+        if self.timer is not None:
             self.timer.start()
 
     def stop(self):
         """Stop timer."""
-        if not self.timer is None:
+        if self.timer is not None:
             self.timer.stop()
         if self.running:
             if self.time % 10 == 0:
@@ -70,7 +70,7 @@ def colour_picker():
     return (255 + random.randrange(0, 256)) / 2
 
 
-def format(time):
+def format_time(time):
     """Convert time in tenths of a second into a formatted string A:BC.D.
 
     :param time: time in tenths of a second
@@ -89,7 +89,7 @@ def draw(frame, canvas):
     score_width = frame.get_canvas_textwidth(score_str, SCORE_SIZE, FONT)
     canvas.draw_text(score_str, [300 - score_width - 10, 30], SCORE_SIZE, "White", FONT)
     # draw time
-    time_str = format(TIME.time)
+    time_str = format_time(TIME.time)
     time_width = frame.get_canvas_textwidth(time_str, TIME_SIZE, FONT)
     canvas.draw_text(time_str, [300 - time_width - 75, 100], TIME_SIZE, TIME.colour, FONT)
 
@@ -108,8 +108,7 @@ def main():
     frame = simplegui.create_frame("Stopwatch: The Game", 300, 200, 200)
 
     # register event handlers
-    draw_handler = lambda h, f, c: h(f, c)
-    frame.set_draw_handler(lambda c: draw_handler(draw, frame, c))
+    frame.set_draw_handler(lambda c: draw(frame, c))
     frame.add_button("Start", TIME.start)
     frame.add_button("Stop", TIME.stop)
     frame.add_button("Reset", TIME.reset)
