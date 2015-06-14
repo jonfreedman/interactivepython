@@ -1,14 +1,4 @@
-"""
-Stopwatch: The Game.
-
-Stop the timer to the second exactly to score a point
-
-Timer colours courtesy of http://tinyurl.com/mopmdyn
-
-.. _SimpleGUICS2Pygame:
-   https://simpleguics2pygame.readthedocs.org
-"""
-
+from __future__ import print_function
 import random
 
 try:
@@ -85,7 +75,16 @@ def draw(canvas):
 
 
 def main():
-    """Play the game."""
+    """
+    Stopwatch: The Game.
+
+    Stop the timer to the second exactly to score a point
+
+    Timer colours courtesy of http://tinyurl.com/mopmdyn
+
+    .. _SimpleGUICS2Pygame:
+       https://simpleguics2pygame.readthedocs.org
+    """
     global timer, frame
 
     # create frame
