@@ -44,7 +44,7 @@ class Game(object):
         return guess == self.secret_number
 
     def can_guess(self):
-        """Check if further guesses are possible
+        """Check if further guesses are possible.
 
         :returns: True if another guess is possible
         """
