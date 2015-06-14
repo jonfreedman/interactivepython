@@ -10,6 +10,6 @@ virtualenv:
 install:
     - pip install -r requirements.txt
 script:
-    - py.test
+    - py.test --cov com.github.jfreedman.interactivepython --cov-report term-missing tests/
 after_success:
     - coveralls
