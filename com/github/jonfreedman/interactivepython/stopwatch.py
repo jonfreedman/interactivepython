@@ -13,29 +13,30 @@ __author__ = 'jon'
 
 class Timer(object):
 
-    """Keeps track of time."""
-
     def __init__(self, timer=None):
-        """Create new timer at 0."""
+        """Keeps track of time.
+
+        :param timer: simplegui timer
+        """
+        self.time = 0
+        self.points = 0
+        self.stops = 0
+        self.running = False
+        self.colour = "#FFFFFF"
         self.timer = timer
-        self.reset()
+        if self.timer is not None:
+            self.timer.stop()
 
     def set_timer(self, timer):
         """Pass reference to simplegui timer.
 
         :param timer: simplegui timer
         """
-        self.timer = timer
+        self.__init__(timer)
 
     def reset(self):
-        """Reset timer to 0."""
-        self.time = 0
-        self.points = 0
-        self.stops = 0
-        self.running = False
-        self.colour = "#FFFFFF"
-        if self.timer is not None:
-            self.timer.stop()
+        """Reset the timer to 0."""
+        self.__init__(self.timer)
 
     def start(self):
         """Start timer."""
