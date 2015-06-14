@@ -1,4 +1,4 @@
-"""Mini-Project: Week 2"""
+"""Mini-Project: Week 2."""
 
 from __future__ import print_function
 import random
@@ -29,9 +29,6 @@ class Game:
 
     def can_guess(self):
         return self.guess_count < self.max_guesses
-
-
-GAME = Game(100, 7)
 
 
 def _new_game(game_range, max_guesses):
@@ -101,6 +98,7 @@ def main():
     frame.add_button("Range: 0 - 100", range100, 100)
     frame.add_button("Range: 0 - 1000", range1000, 100)
 
+    range100()
     frame.start()
 
 if __name__ == '__main__':
