@@ -54,18 +54,11 @@ def input_guess(guess):
         print("Correct")
         new_game()
         return
-    elif numeric_guess < secret_number:
-        print("Lower")
-    else:
-        print("Higher")
 
     global guess_count
     guess_count += 1
-
-    if guess_count <= max_guesses:
-        print(str(max_guesses - guess_count) + " guesses remaining...")
-    else:
-        print(r"""
+    if guess_count == max_guesses:
+        print("Value was " + str(secret_number) + r"""
 _____.___.              .____
 \__  |   | ____  __ __  |    |    ____  ______ ____
  /   |   |/  _ \|  |  \ |    |   /  _ \/  ___// __ \
@@ -74,7 +67,12 @@ _____.___.              .____
  \/                             \/         \/     \/
 """)
         new_game()
+    elif numeric_guess < secret_number:
+        print("Lower")
+    else:
+        print("Higher")
 
+    print(str(max_guesses - guess_count) + " guesses remaining...")
 
 # create frame
 frame = simplegui.create_frame("Guess the number", 300, 300)
