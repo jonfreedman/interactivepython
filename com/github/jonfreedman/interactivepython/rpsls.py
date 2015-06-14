@@ -63,9 +63,14 @@ def rpsls(player_choice):
     else:
         print("Player wins!")
 
-# play the game
-rpsls("rock")
-rpsls("Spock")
-rpsls("paper")
-rpsls("lizard")
-rpsls("scissors")
+
+def main():
+    # play the game
+    rpsls("rock")
+    rpsls("Spock")
+    rpsls("paper")
+    rpsls("lizard")
+    rpsls("scissors")
+
+if __name__ == '__main__':
+    main()
