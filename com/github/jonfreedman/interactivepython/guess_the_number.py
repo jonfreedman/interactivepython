@@ -1,3 +1,5 @@
+"""Mini-Project: Week 2"""
+
 from __future__ import print_function
 import random
 
@@ -8,56 +10,66 @@ except ImportError:
 
 __author__ = 'jon'
 
-GAME_RANGE = 100
-MAX_GUESSES = 7
-GUESS_COUNT = 0
 
-SECRET_NUMBER = 0
+class Game:
+    """Holds the game state."""
+    def __init__(self, game_range, max_guesses):
+        self.game_range = game_range
+        self.max_guesses = max_guesses
+        self.reset()
+
+    def reset(self):
+        self.guess_count = 0
+        self.secret_number = random.randrange(0, self.game_range)
+        print("Started a new game, guess in [0," + str(self.game_range) + ")")
+
+    def guess(self, x):
+        self.guess_count += 1
+        return x == self.secret_number
+
+    def can_guess(self):
+        return self.guess_count < self.max_guesses
 
 
-def new_game():
+GAME = Game(100, 7)
+
+
+def _new_game(game_range, max_guesses):
     """helper function to start and restart the game."""
-    global GUESS_COUNT, SECRET_NUMBER
-    GUESS_COUNT = 0
-    SECRET_NUMBER = random.randrange(0, GAME_RANGE)
-    print("Started a new game, guess in [0," + str(GAME_RANGE) + ")")
+    global GAME
+    GAME = Game(game_range, max_guesses)
 
 
 # define event handlers for control panel
 def range100():
     """Start a new game using [0,100)."""
-    global GAME_RANGE, MAX_GUESSES
-    GAME_RANGE = 100
-    MAX_GUESSES = 7
-    new_game()
+    _new_game(100, 7)
 
 
 def range1000():
     """Start a new game using [0,1000)."""
-    global GAME_RANGE, MAX_GUESSES
-    GAME_RANGE = 1000
-    MAX_GUESSES = 10
-    new_game()
+    _new_game(1000, 10)
 
 
 def input_guess(guess):
+    global GAME
+
     """Compare guess against secret number."""
     try:
         numeric_guess = int(guess)
     except ValueError:
-        raise ValueError(guess + " is not a valid guess")
+        print(guess + " is not a valid guess")
+        return
 
     print("Guess was " + str(numeric_guess))
 
-    if numeric_guess == SECRET_NUMBER:
+    if GAME.guess(numeric_guess):
         print("Correct")
-        new_game()
+        GAME.reset()
         return
 
-    global GUESS_COUNT
-    GUESS_COUNT += 1
-    if GUESS_COUNT == MAX_GUESSES:
-        print("Value was " + str(SECRET_NUMBER) + r"""
+    if not GAME.can_guess():
+        print("Value was " + str(GAME.secret_number) + r"""
 _____.___.              .____
 \__  |   | ____  __ __  |    |    ____  ______ ____
  /   |   |/  _ \|  |  \ |    |   /  _ \/  ___// __ \
@@ -65,13 +77,13 @@ _____.___.              .____
  / ______|\____/|____/  |_______ \____/____  >\___  >
  \/                             \/         \/     \/
 """)
-        new_game()
-    elif numeric_guess < SECRET_NUMBER:
+        GAME.reset()
+    elif numeric_guess < GAME.secret_number:
         print("Lower")
     else:
         print("Higher")
 
-    print(str(MAX_GUESSES - GUESS_COUNT) + " guesses remaining...")
+    print(str(GAME.max_guesses - GAME.guess_count) + " guesses remaining...")
 
 
 def main():
@@ -89,7 +101,7 @@ def main():
     frame.add_button("Range: 0 - 100", range100, 100)
     frame.add_button("Range: 0 - 1000", range1000, 100)
 
-    new_game()
+    range100()
     frame.start()
 
 if __name__ == '__main__':

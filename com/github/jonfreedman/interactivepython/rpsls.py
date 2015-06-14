@@ -1,3 +1,5 @@
+"""Mini-Project: Week 1"""
+
 from __future__ import print_function
 import random
 
@@ -67,7 +69,7 @@ def rpsls(player_choice):
 
 
 def main():
-    """play the game"""
+    """Play the game."""
     rpsls("rock")
     rpsls("Spock")
     rpsls("paper")
