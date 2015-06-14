@@ -11,11 +11,16 @@ except ImportError:
 __author__ = 'jon'
 
 
-class Game:
+class Game(object):
+
     """Holds the game state."""
 
-    def __init__(self, game_range, max_guesses):
-        """Instantiate a new game picking a random number in [0,game_range).
+    def __init__(self):
+        """Instantiate a new game picking a random number in [0, 100)."""
+        self.set_config(100, 7)
+
+    def set_config(self, game_range, max_guesses):
+        """Set the game configuration and start a new game.
 
         :param game_range: upper bound for number
         :param max_guesses: maximum number of guesses allowed
@@ -39,31 +44,29 @@ class Game:
         return guess == self.secret_number
 
     def can_guess(self):
-        """:returns: True if another guess is possible"""
+        """Check if further guesses are possible
+
+        :returns: True if another guess is possible
+        """
         return self.guess_count < self.max_guesses
 
 
-def _new_game(game_range, max_guesses):
-    """helper function to start and restart the game."""
-    global GAME
-    GAME = Game(game_range, max_guesses)
+GAME = Game(100, 7)
 
 
 # define event handlers for control panel
 def range100():
     """Start a new game using [0,100)."""
-    _new_game(100, 7)
+    GAME.set_config(100, 7)
 
 
 def range1000():
     """Start a new game using [0,1000)."""
-    _new_game(1000, 10)
+    GAME.set_config(1000, 10)
 
 
 def input_guess(guess):
     """Guess event handler, compare guess against secret number."""
-    global GAME
-
     try:
         numeric_guess = int(guess)
     except ValueError:
@@ -110,7 +113,6 @@ def main():
     frame.add_button("Range: 0 - 100", range100, 100)
     frame.add_button("Range: 0 - 1000", range1000, 100)
 
-    range100()
     frame.start()
 
 if __name__ == '__main__':
