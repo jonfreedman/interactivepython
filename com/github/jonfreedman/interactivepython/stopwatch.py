@@ -9,13 +9,14 @@ Timer colours courtesy of http://tinyurl.com/mopmdyn
    https://simpleguics2pygame.readthedocs.org
 """
 
-__author__ = 'jon'
-
 import random
+
 try:
     import simplegui
 except ImportError:
     import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
+
+__author__ = 'jon'
 
 # define global variables
 time = 0

@@ -7,39 +7,44 @@ All output for the game will be printed in the console
    https://simpleguics2pygame.readthedocs.org
 """
 
-__author__ = 'jon'
-
 import random
+
 try:
     import simplegui
 except ImportError:
     import SimpleGUICS2Pygame.simpleguics2pygame as simplegui
 
-game_range = 100
-max_guesses = 7
-guess_count = 0
+__author__ = 'jon'
 
-secret_number = 0
+GAME_RANGE = 100
+MAX_GUESSES = 7
+GUESS_COUNT = 0
+
+SECRET_NUMBER = 0
+
 
 def new_game():
     """helper function to start and restart the game"""
-    global guess_count, secret_number
-    guess_count = 0
-    secret_number = random.randrange(0, game_range)
-    print("Started a new game, guess in [0," + str(game_range) + ")")
+    global GUESS_COUNT, SECRET_NUMBER
+    GUESS_COUNT = 0
+    SECRET_NUMBER = random.randrange(0, GAME_RANGE)
+    print("Started a new game, guess in [0," + str(GAME_RANGE) + ")")
+
 
 # define event handlers for control panel
 def range100():
-    global game_range, max_guesses
-    game_range = 100
-    max_guesses = 7
+    global GAME_RANGE, MAX_GUESSES
+    GAME_RANGE = 100
+    MAX_GUESSES = 7
     new_game()
 
+
 def range1000():
-    global game_range, max_guesses
-    game_range = 1000
-    max_guesses = 10
+    global GAME_RANGE, MAX_GUESSES
+    GAME_RANGE = 1000
+    MAX_GUESSES = 10
     new_game()
+
 
 def input_guess(guess):
     """Compare guess against secret number"""
@@ -50,15 +55,15 @@ def input_guess(guess):
 
     print("Guess was " + str(numeric_guess))
 
-    if numeric_guess == secret_number:
+    if numeric_guess == SECRET_NUMBER:
         print("Correct")
         new_game()
         return
 
-    global guess_count
-    guess_count += 1
-    if guess_count == max_guesses:
-        print("Value was " + str(secret_number) + r"""
+    global GUESS_COUNT
+    GUESS_COUNT += 1
+    if GUESS_COUNT == MAX_GUESSES:
+        print("Value was " + str(SECRET_NUMBER) + r"""
 _____.___.              .____
 \__  |   | ____  __ __  |    |    ____  ______ ____
  /   |   |/  _ \|  |  \ |    |   /  _ \/  ___// __ \
@@ -67,20 +72,26 @@ _____.___.              .____
  \/                             \/         \/     \/
 """)
         new_game()
-    elif numeric_guess < secret_number:
+    elif numeric_guess < SECRET_NUMBER:
         print("Lower")
     else:
         print("Higher")
 
-    print(str(max_guesses - guess_count) + " guesses remaining...")
+    print(str(MAX_GUESSES - GUESS_COUNT) + " guesses remaining...")
 
-# create frame
-frame = simplegui.create_frame("Guess the number", 300, 300)
 
-# register event handlers for control elements and start frame
-frame.add_input("Guess:", input_guess, 100)
-frame.add_button("Range: 0 - 100", range100, 100)
-frame.add_button("Range: 0 - 1000", range1000, 100)
+def main():
+    # create frame
+    frame = simplegui.create_frame("Guess the number", 300, 300)
 
-new_game()
-frame.start()
+    # register event handlers for control elements and start frame
+    frame.add_input("Guess:", input_guess, 100)
+    frame.add_button("Range: 0 - 100", range100, 100)
+    frame.add_button("Range: 0 - 1000", range1000, 100)
+
+    new_game()
+    frame.start()
+
+
+if __name__ == '__main__':
+    main()

@@ -1,11 +1,10 @@
-"""Play rock, paper, scissors, lizard, Spock"""
+import random
 
 __author__ = 'jon'
 
-import random
 
 def name_to_number(name):
-    """convert name to number"""
+    """convert name to number."""
     if name == "rock":
         return 0
     elif name == "Spock":
@@ -18,8 +17,9 @@ def name_to_number(name):
         return 4
     raise ValueError("Cannot play with " + name)
 
+
 def number_to_name(number):
-    """convert number to a name"""
+    """convert number to a name."""
     if number == 0:
         return "rock"
     elif number == 1:
@@ -34,6 +34,8 @@ def number_to_name(number):
 
 
 def rpsls(player_choice):
+    """Play rock, paper, scissors, lizard, Spock."""
+
     # print a blank line to separate consecutive games
     print("")
 
