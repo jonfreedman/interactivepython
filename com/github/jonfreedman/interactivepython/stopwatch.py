@@ -15,13 +15,10 @@ class Timer(object):
 
     """Keeps track of time."""
 
-    def __init__(self):
+    def __init__(self, timer=None):
         """Create new timer at 0."""
-        self.time = 0
-        self.points = 0
-        self.stops = 0
-        self.running = False
-        self.colour = "#FFFFFF"
+        self.timer = timer
+        self.reset()
 
     def set_timer(self, timer):
         """Pass reference to simplegui timer.
@@ -37,16 +34,19 @@ class Timer(object):
         self.stops = 0
         self.running = False
         self.colour = "#FFFFFF"
-        self.timer.stop()
+        if not self.timer is None:
+            self.timer.stop()
 
     def start(self):
         """Start timer."""
         self.running = True
-        self.timer.start()
+        if not self.timer is None:
+            self.timer.start()
 
     def stop(self):
         """Stop timer."""
-        self.timer.stop()
+        if not self.timer is None:
+            self.timer.stop()
         if self.running:
             if self.time % 10 == 0:
                 self.points += 1
@@ -56,12 +56,7 @@ class Timer(object):
     def tick(self):
         """Tick the timer."""
         self.time += 1
-        self.colour = "#%02X%02X%02X" % (self.__colour_picker(), self.__colour_picker(), self.__colour_picker())
-
-    def __colour_picker(self):
-        """Generate a random 2-digit hex pastel colour."""
-        return (255 + random.randrange(0, 256)) / 2
-
+        self.colour = "#%02X%02X%02X" % (colour_picker(), colour_picker(), colour_picker())
 
 # define global variables
 TIME = Timer()
@@ -70,11 +65,20 @@ SCORE_SIZE = 24
 TIME_SIZE = 36
 
 
-def format(t):
-    """Convert time in tenths of a second into a formatted string A:BC.D."""
-    mins = "%d" % (t // 600)
-    secs = "%02d" % ((t // 10) % 60)
-    tenths = "%d" % (t % 10)
+def colour_picker():
+    """Generate a random 2-digit hex pastel colour."""
+    return (255 + random.randrange(0, 256)) / 2
+
+
+def format(time):
+    """Convert time in tenths of a second into a formatted string A:BC.D.
+
+    :param time: time in tenths of a second
+    :returns: formatted time string
+    """
+    mins = "%d" % (time // 600)
+    secs = "%02d" % ((time // 10) % 60)
+    tenths = "%d" % (time % 10)
     return mins + ":" + secs + "." + tenths
 
 
@@ -101,8 +105,6 @@ def main():
     .. _SimpleGUICS2Pygame:
        https://simpleguics2pygame.readthedocs.org
     """
-
-    # create frame
     frame = simplegui.create_frame("Stopwatch: The Game", 300, 200, 200)
 
     # register event handlers
