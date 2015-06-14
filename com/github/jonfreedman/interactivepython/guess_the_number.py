@@ -101,7 +101,6 @@ def main():
     frame.add_button("Range: 0 - 100", range100, 100)
     frame.add_button("Range: 0 - 1000", range1000, 100)
 
-    range100()
     frame.start()
 
 if __name__ == '__main__':
