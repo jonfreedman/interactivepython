@@ -13,21 +13,33 @@ __author__ = 'jon'
 
 class Game:
     """Holds the game state."""
+
     def __init__(self, game_range, max_guesses):
+        """Instantiate a new game picking a random number in [0,game_range).
+
+        :param game_range: upper bound for number
+        :param max_guesses: maximum number of guesses allowed
+        """
         self.game_range = game_range
         self.max_guesses = max_guesses
         self.reset()
 
     def reset(self):
+        """Reset the game state, set guess_count to 0 and pick a new number."""
         self.guess_count = 0
         self.secret_number = random.randrange(0, self.game_range)
         print("Started a new game, guess in [0," + str(self.game_range) + ")")
 
-    def guess(self, x):
+    def guess(self, guess):
+        """Record a guess.
+
+        :param guess: the guess
+        """
         self.guess_count += 1
-        return x == self.secret_number
+        return guess == self.secret_number
 
     def can_guess(self):
+        """:returns: True if another guess is possible"""
         return self.guess_count < self.max_guesses
 
 
@@ -49,9 +61,9 @@ def range1000():
 
 
 def input_guess(guess):
+    """Guess event handler, compare guess against secret number."""
     global GAME
 
-    """Compare guess against secret number."""
     try:
         numeric_guess = int(guess)
     except ValueError:
