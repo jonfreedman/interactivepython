@@ -35,7 +35,6 @@ def number_to_name(number):
 
 def rpsls(player_choice):
     """Play rock, paper, scissors, lizard, Spock."""
-
     # print a blank line to separate consecutive games
     print("")
 
@@ -67,7 +66,7 @@ def rpsls(player_choice):
 
 
 def main():
-    # play the game
+    """play the game"""
     rpsls("rock")
     rpsls("Spock")
     rpsls("paper")

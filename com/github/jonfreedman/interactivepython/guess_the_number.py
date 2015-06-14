@@ -1,12 +1,3 @@
-"""
-Play guess the number using SimpleGUICS2Pygame
-
-All output for the game will be printed in the console
-
-.. _SimpleGUICS2Pygame:
-   https://simpleguics2pygame.readthedocs.org
-"""
-
 import random
 
 try:
@@ -24,7 +15,7 @@ SECRET_NUMBER = 0
 
 
 def new_game():
-    """helper function to start and restart the game"""
+    """helper function to start and restart the game."""
     global GUESS_COUNT, SECRET_NUMBER
     GUESS_COUNT = 0
     SECRET_NUMBER = random.randrange(0, GAME_RANGE)
@@ -33,6 +24,7 @@ def new_game():
 
 # define event handlers for control panel
 def range100():
+    """Start a new game using [0,100)."""
     global GAME_RANGE, MAX_GUESSES
     GAME_RANGE = 100
     MAX_GUESSES = 7
@@ -40,6 +32,7 @@ def range100():
 
 
 def range1000():
+    """Start a new game using [0,1000)."""
     global GAME_RANGE, MAX_GUESSES
     GAME_RANGE = 1000
     MAX_GUESSES = 10
@@ -47,7 +40,7 @@ def range1000():
 
 
 def input_guess(guess):
-    """Compare guess against secret number"""
+    """Compare guess against secret number."""
     try:
         numeric_guess = int(guess)
     except ValueError:
@@ -81,6 +74,12 @@ _____.___.              .____
 
 
 def main():
+    """
+    Play guess the number, all output for the game will be printed in the console.
+
+    .. _SimpleGUICS2Pygame:
+       https://simpleguics2pygame.readthedocs.org
+    """
     # create frame
     frame = simplegui.create_frame("Guess the number", 300, 300)
 
@@ -91,7 +90,6 @@ def main():
 
     new_game()
     frame.start()
-
 
 if __name__ == '__main__':
     main()

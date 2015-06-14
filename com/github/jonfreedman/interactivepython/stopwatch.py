@@ -1,5 +1,5 @@
 """
-Stopwatch: The Game
+Stopwatch: The Game.
 
 Stop the timer to the second exactly to score a point
 
@@ -19,68 +19,73 @@ except ImportError:
 __author__ = 'jon'
 
 # define global variables
-time = 0
-colour = "#FFFFFF"
-running = False
-points = 0
-stops = 0
+TIME = 0
+COLOUR = "#FFFFFF"
+RUNNING = False
+POINTS = 0
+STOPS = 0
 
-font = "monospace"
-score_size = 24
-time_size = 36
+FONT = "monospace"
+SCORE_SIZE = 24
+TIME_SIZE = 36
 
 def format(t):
-    """Convert time in tenths of a second into a formatted string A:BC.D"""
+    """Convert time in tenths of a second into a formatted string A:BC.D."""
     mins = "%d" % (t // 600)
     secs = "%02d" % ((t // 10) % 60)
     tenths = "%d" % (t % 10)
     return mins + ":" + secs + "." + tenths
 
 def colour_picker():
+    """Generate a random 2-digit hex pastel colour."""
     return (255 + random.randrange(0, 256)) / 2
 
 # define event handlers for buttons; "Start", "Stop", "Reset"
 def start():
-    global timer, running
+    """Start the timer."""
+    global timer, RUNNING
     timer.start()
-    running = True
+    RUNNING = True
 
 def stop():
-    global timer, running, time, points, stops
+    """Stop the timer and check if a point is scored."""
+    global timer, RUNNING, TIME, POINTS, STOPS
     timer.stop()
-    if running:
-        if time % 10 == 0:
-            points += 1
-        stops += 1
-    running = False
+    if RUNNING:
+        if TIME % 10 == 0:
+            POINTS += 1
+        STOPS += 1
+    RUNNING = False
 
 def reset():
-    global time, points, stops
+    """Reset the timer."""
+    global TIME, POINTS, STOPS
     stop()
-    time = points = stops = 0
+    TIME = POINTS = STOPS = 0
 
 def increment():
-    """event handler for timer"""
-    global time, colour
-    time += 1
-    colour = "#%02X%02X%02X" % (colour_picker(), colour_picker(), colour_picker())
+    """Event handler for timer."""
+    global TIME, COLOUR
+    TIME += 1
+    COLOUR = "#%02X%02X%02X" % (colour_picker(), colour_picker(), colour_picker())
 
-# define draw handler
 def draw(canvas):
-    global time
+    """Draw handler."""
+    global TIME
 
     # draw score
-    score_str = str(points) + "/" + str(stops)
-    score_width = frame.get_canvas_textwidth(score_str, score_size, font)
-    canvas.draw_text(score_str, [300 - score_width - 10, 30], score_size, "White", font)
+    score_str = str(POINTS) + "/" + str(STOPS)
+    score_width = frame.get_canvas_textwidth(score_str, SCORE_SIZE, FONT)
+    canvas.draw_text(score_str, [300 - score_width - 10, 30], SCORE_SIZE, "White", FONT)
 
     # draw time
-    time_str = format(time)
-    time_width = frame.get_canvas_textwidth(time_str, time_size, font)
-    canvas.draw_text(time_str, [300 - time_width - 75, 100], time_size, colour, font)
+    time_str = format(TIME)
+    time_width = frame.get_canvas_textwidth(time_str, TIME_SIZE, FONT)
+    canvas.draw_text(time_str, [300 - time_width - 75, 100], TIME_SIZE, COLOUR, FONT)
 
 
 def main():
+    """Play the game."""
     global timer, frame
 
     # create frame
