@@ -19,7 +19,8 @@ class Game(object):
         """Instantiate a new game picking a random number in [0, game_range).
 
         :param game_range: upper bound for number
-        :param max_guesses: maximum number of guesses allowed"""
+        :param max_guesses: maximum number of guesses allowed
+        """
         self.game_range = game_range
         self.max_guesses = max_guesses
         self.guess_count = 0

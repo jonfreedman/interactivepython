@@ -14,3 +14,29 @@ def test_format():
     assert stopwatch.format_time(1325) == "2:12.5"
     assert stopwatch.format_time(4567) == "7:36.7"
     assert stopwatch.format_time(5999) == "9:59.9"
+
+def test_starts_at_zero():
+    timer = stopwatch.Timer()
+    assert timer.time == 0
+    assert not timer.running
+
+def test_start_stop_recorded():
+    timer = stopwatch.Timer()
+    timer.start()
+    assert timer.running
+    timer.stop()
+    assert not timer.running
+
+def test_timer_can_tick():
+    timer = stopwatch.Timer()
+    timer.tick()
+    assert timer.time == 1
+    timer.tick()
+    assert timer.time == 2
+
+def test_timer_can_reset():
+    timer = stopwatch.Timer()
+    timer.tick()
+    assert timer.time == 1
+    timer.reset()
+    assert timer.time == 0
