@@ -51,7 +51,7 @@ class Game(object):
         return self.guess_count < self.max_guesses
 
 
-GAME = Game(100, 7)
+GAME = Game()
 
 
 # define event handlers for control panel
