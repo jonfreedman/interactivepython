@@ -78,15 +78,22 @@ def draw(canvas):
     time_width = frame.get_canvas_textwidth(time_str, time_size, font)
     canvas.draw_text(time_str, [300 - time_width - 75, 100], time_size, colour, font)
 
-# create frame
-frame = simplegui.create_frame("Stopwatch: The Game", 300, 200, 200)
 
-# register event handlers
-frame.set_draw_handler(draw)
-frame.add_button("Start", start)
-frame.add_button("Stop", stop)
-frame.add_button("Reset", reset)
+def main():
+    global timer, frame
 
-# start frame
-timer = simplegui.create_timer(100, increment)
-frame.start()
+    # create frame
+    frame = simplegui.create_frame("Stopwatch: The Game", 300, 200, 200)
+
+    # register event handlers
+    frame.set_draw_handler(draw)
+    frame.add_button("Start", start)
+    frame.add_button("Stop", stop)
+    frame.add_button("Reset", reset)
+
+    # start frame
+    timer = simplegui.create_timer(100, increment)
+    frame.start()
+
+if __name__ == '__main__':
+    main()

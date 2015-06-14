@@ -4,7 +4,7 @@ __author__ = 'jon'
 
 import random
 
-def __name_to_number(name):
+def name_to_number(name):
     """convert name to number"""
     if name == "rock":
         return 0
@@ -18,7 +18,7 @@ def __name_to_number(name):
         return 4
     raise ValueError("Cannot play with " + name)
 
-def __number_to_name(number):
+def number_to_name(number):
     """convert number to a name"""
     if number == 0:
         return "rock"
@@ -41,13 +41,13 @@ def rpsls(player_choice):
     print("Player chooses " + player_choice)
 
     # convert the player's choice to player_number using the function name_to_number()
-    player_number = __name_to_number(player_choice)
+    player_number = name_to_number(player_choice)
 
     # compute random guess for comp_number using random.randrange()
     comp_number = random.randrange(0, 5)
 
     # convert comp_number to comp_choice using the function number_to_name()
-    comp_choice = __number_to_name(comp_number)
+    comp_choice = number_to_name(comp_number)
 
     # print out the message for computer's choice
     print("Computer chooses " + comp_choice)
