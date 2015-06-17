@@ -87,9 +87,9 @@ _____.___.              .____
 """)
         GAME.reset()
     elif numeric_guess < GAME.secret_number:
-        print("Lower")
-    else:
         print("Higher")
+    else:
+        print("Lower")
 
     print(str(GAME.max_guesses - GAME.guess_count) + " guesses remaining...")
 
