@@ -14,3 +14,9 @@ def test_guessing_increments_guess_count():
     game = guess.Game()
     game.guess(50)
     assert game.guess_count == 1
+
+def test_resetting_game_keeps_current_range():
+    game = guess.Game()
+    game.guess(50)
+    game.reset()
+    assert game.guess_count == 0
