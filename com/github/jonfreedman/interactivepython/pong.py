@@ -135,7 +135,7 @@ class Game(object):
     """Class to hold the game state."""
 
     def __init__(self):
-        """Start a new game
+        """Start a new game.
 
         :param: ball: the ball
         :param: paddle1: the left paddle
@@ -224,7 +224,6 @@ def new_game():
 
 def draw(canvas):
     """Draw handler."""
-
     # draw mid line and gutters
     canvas.draw_line([WIDTH / 2, 0], [WIDTH / 2, HEIGHT], 1, "White")
     canvas.draw_line([GUTTER_WIDTH, 0], [GUTTER_WIDTH, HEIGHT], 1, "White")
