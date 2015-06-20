@@ -87,3 +87,21 @@ def test_game_reset_sets_score_to_zero():
     assert game.score == [1, 0]
     game.reset()
     assert game.score == [0, 0]
+
+def test_game_starts_paused():
+    game = pong.Game()
+    assert game.pause == 20
+
+def test_checking_if_game_is_paused_decrements_pause_timer():
+    game = pong.Game()
+    assert game.pause == 20
+    game.is_paused()
+    assert game.pause == 19
+
+def test_game_reset_sets_pause():
+    game = pong.Game()
+    assert game.pause == 20
+    game.is_paused()
+    assert game.pause == 19
+    game.reset()
+    assert game.pause == 20

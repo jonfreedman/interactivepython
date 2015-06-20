@@ -204,6 +204,7 @@ class Game(object):
         self.paddle1.reset()
         self.paddle2.reset()
         self.score = [0, 0]
+        self.pause = 20
 
 # initialize globals
 WIDTH = 600
