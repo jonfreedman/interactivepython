@@ -2,3 +2,6 @@ doc-warnings: yes
 test-warnings: no
 strictness: veryhigh
 max-line-length: 120
+pylint:
+  disable:
+    - D203

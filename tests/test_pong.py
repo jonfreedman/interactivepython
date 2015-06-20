@@ -6,20 +6,20 @@ def test_paddle_cannot_leave_table():
 
     paddle.change_velocity(-1 * 60)
 
-    assert paddle.y() == 2
+    assert paddle.get_y() == 2
     paddle.move()
-    assert paddle.y() == 1
+    assert paddle.get_y() == 1
     paddle.move()
-    assert paddle.y() == 1
+    assert paddle.get_y() == 1
 
     paddle.change_velocity(1 * 60)
 
     paddle.move()
-    assert paddle.y() == 2
+    assert paddle.get_y() == 2
     paddle.move()
-    assert paddle.y() == 3
+    assert paddle.get_y() == 3
     paddle.move()
-    assert paddle.y() == 3
+    assert paddle.get_y() == 3
 
 def test_paddle_touches_ball():
     # create paddle centered on pixel 50 covering pixels [40,60)

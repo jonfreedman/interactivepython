@@ -19,11 +19,11 @@ class Drawable(object):
         self.initial_position = tuple(position)
         self.position = position
 
-    def x(self):
+    def get_x(self):
         """x co-ordinate."""
         return int(self.position[0])
 
-    def y(self):
+    def get_y(self):
         """y co-ordinate."""
         return int(self.position[1])
 
@@ -35,6 +35,7 @@ class Ball(Drawable):
     """Class to encapsulate translation from velocity in pixels per second to position refreshed 60 times per sec."""
 
     def __init__(self, position, radius):
+        """Initialise with 0 velocity."""
         Drawable.__init__(self, position)
         self.radius = radius
         self.velocity = [0, 0]
@@ -42,23 +43,28 @@ class Ball(Drawable):
         self.colour = GREYS
 
     def move(self):
+        """Move according to current velocity."""
         self.position[0] += self.velocity[0] / 60.
         self.position[1] += self.velocity[1] / 60.
 
     def bounce_horizontal(self):
+        """Bounce horizontally off a vertical surface."""
         self.velocity[0] *= -1.1
         self.position[0] += self.velocity[0] / 60.
         self.direction = not self.direction
 
     def bounce_vertical(self):
+        """Bounce vertically off a horizontal surface."""
         self.velocity[1] *= -1
         self.position[1] += self.velocity[1] / 60.
 
     def freeze(self):
+        """Set velocity to zero and turn red."""
         self.velocity = [0, 0]
         self.colour = REDS
 
     def reset(self, direction=None):
+        """Return to original position and set a random velocity."""
         Drawable.reset(self)
         if direction is None:
             direction = not self.direction
@@ -67,7 +73,8 @@ class Ball(Drawable):
         self.colour = GREYS
 
     def draw(self, canvas):
-        centre = (self.x(), self.y())
+        """Draw self."""
+        centre = (self.get_x(), self.get_y())
         canvas.draw_circle(centre, self.radius, 1, self.colour[0], self.colour[1])
         canvas.draw_circle(centre, self.radius * (5 / 6.), 1, self.colour[2], self.colour[2])
         canvas.draw_circle(centre, self.radius * (4 / 6.), 1, self.colour[3], self.colour[3])
@@ -80,6 +87,7 @@ class Paddle(Drawable):
     """Represents the paddles controlled by players."""
 
     def __init__(self, position, height, width, vertical_range):
+        """Initialise with 0 velocity."""
         Drawable.__init__(self, position)
         self.height = height
         self.width = width
@@ -87,29 +95,32 @@ class Paddle(Drawable):
         self.vertical_range = vertical_range
 
     def move(self):
+        """Move according to current velocity."""
         self.position[1] += self.velocity / 60.
         if not self.__within_vertical_range():
             self.position[1] -= self.velocity / 60.
             self.velocity = 0
 
     def change_velocity(self, velocity):
+        """Change velocity."""
         if self.__within_vertical_range():
             self.velocity = velocity
 
     def touching_ball(self, ball):
-        return (ball.y() >= self.y() - (self.height / 2.)) and (ball.y() <= self.y() + (self.height / 2.) - 1)
+        """Check if touching a given ball."""
+        return (ball.get_y() >= self.get_y() - (self.height / 2.)) and (ball.get_y() <= self.get_y() + (self.height / 2.) - 1)
 
     def __within_vertical_range(self):
-        return not (
-            (self.y() - (self.height / 2.) < self.vertical_range[0])
-            or (self.y() + (self.height / 2.) > self.vertical_range[1])
-        )
+        """Check within permitted vertical range."""
+        return not ((self.get_y() - (self.height / 2.) < self.vertical_range[0]) or (self.get_y() + (self.height / 2.) > self.vertical_range[1]))
 
     def reset(self):
+        """Return to original position and set velocity to zero."""
         Drawable.reset(self)
         self.velocity = 0
 
     def draw(self, canvas):
+        """Draw self."""
         x1 = self.position[0] - (self.width / 2)
         x2 = self.position[0] + (self.width / 2)
         y1 = self.position[1] - (self.height / 2)
@@ -145,9 +156,9 @@ def new_game():
 
 
 def draw(canvas):
+    """Draw handler."""
     global PAUSE
 
-    """Draw handler."""
     # draw mid line and gutters
     canvas.draw_line([WIDTH / 2, 0], [WIDTH / 2, HEIGHT], 1, "White")
     canvas.draw_line([PAD_WIDTH, 0], [PAD_WIDTH, HEIGHT], 1, "White")
@@ -160,16 +171,16 @@ def draw(canvas):
         PAUSE -= 1
     else:
         # update ball/paddles
-        for d in DRAWABLE:
-            d.move()
+        for drawable in DRAWABLE:
+            drawable.move()
 
         # check if top or bottom walls hit
-        if (BALL.y() <= BALL_RADIUS) or (BALL.y() >= HEIGHT - BALL_RADIUS - 1):
+        if (BALL.get_y() <= BALL_RADIUS) or (BALL.get_y() >= HEIGHT - BALL_RADIUS - 1):
             BALL.bounce_vertical()
 
         # check for gutter/paddles hit
-        hit_left = BALL.x() <= BALL_RADIUS + PAD_WIDTH
-        hit_right = BALL.x() >= WIDTH - BALL_RADIUS - PAD_WIDTH - 1
+        hit_left = BALL.get_x() <= BALL_RADIUS + PAD_WIDTH
+        hit_right = BALL.get_x() >= WIDTH - BALL_RADIUS - PAD_WIDTH - 1
         if hit_left or hit_right:
             if (hit_left and PADDLE1.touching_ball(BALL)) or (hit_right and PADDLE2.touching_ball(BALL)):
                 # hit the ball
@@ -184,8 +195,8 @@ def draw(canvas):
                 PAUSE = 20
 
     # draw ball/paddles
-    for d in DRAWABLE:
-        d.draw(canvas)
+    for drawable in DRAWABLE:
+        drawable.draw(canvas)
 
     # draw scores
     canvas.draw_text(str(SCORES[0]), (100, 50), 24, "white", "monospace")
