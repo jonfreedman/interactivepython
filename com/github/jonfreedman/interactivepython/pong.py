@@ -130,100 +130,136 @@ class Paddle(Drawable):
         _y2 = self.position[1] + (self.height / 2)
         canvas.draw_polygon([(_x1, _y1), (_x1, _y2), (_x2, _y2), (_x2, _y1)], 1, "white", "white")
 
+
+class Game(object):
+    """Class to hold the game state."""
+
+    def __init__(self):
+        """Start a new game
+
+        :param: ball: the ball
+        :param: paddle1: the left paddle
+        :param: paddle2: the right paddle
+        """
+        self.ball = Ball([WIDTH / 2., HEIGHT / 2.], 20)
+        self.paddle1 = Paddle([GUTTER_WIDTH / 2, HEIGHT / 2], 80, GUTTER_WIDTH, (0, HEIGHT - 1))
+        self.paddle2 = Paddle([WIDTH - GUTTER_WIDTH / 2, HEIGHT / 2], 80, GUTTER_WIDTH, (0, HEIGHT - 1))
+        self.drawable = (self.ball, self.paddle1, self.paddle2)
+        self.score = [0, 0]
+        self.pause = 20
+
+    def score_point(self, direction):
+        """Score a point for one of the players.
+
+        :param: direction: player who scores
+        """
+        if direction == LEFT:
+            self.score[0] += 1
+        else:
+            self.score[1] += 1
+        self.pause = 20
+
+    def is_paused(self):
+        """Check if game is paused.
+
+        :returns: True if game is paused
+        """
+        if self.pause > 0:
+            self.pause -= 1
+            if self.pause == 0:
+                self.ball.reset()
+            return True
+        return False
+
+    def move(self):
+        """Move all game objects."""
+        for drawable in self.drawable:
+            drawable.move()
+
+        # check if top or bottom walls hit
+        if (self.ball.get_y() <= self.ball.radius) or (self.ball.get_y() >= HEIGHT - self.ball.radius - 1):
+            self.ball.bounce_vertical()
+
+        # check for gutter/paddles hit
+        hit_left = self.ball.get_x() <= self.ball.radius + GUTTER_WIDTH
+        hit_right = self.ball.get_x() >= WIDTH - self.ball.radius - GUTTER_WIDTH - 1
+        if hit_left or hit_right:
+            if ((hit_left and self.paddle1.touching_ball(self.ball)) or
+                    (hit_right and self.paddle2.touching_ball(self.ball))):
+                # hit the ball
+                self.ball.bounce_horizontal()
+            else:
+                # missed the ball, assign a point
+                self.score_point(not self.ball.direction)
+                self.ball.freeze()
+
+    def draw(self, canvas):
+        """Draw all game objects."""
+        for drawable in self.drawable:
+            drawable.draw(canvas)
+
+    def reset(self):
+        """Start a new game."""
+        self.ball.reset(random.choice([LEFT, RIGHT]))
+        self.paddle1.reset()
+        self.paddle2.reset()
+        self.score = [0, 0]
+
 # initialize globals
 WIDTH = 600
 HEIGHT = 400
-BALL_RADIUS = 20
-PAD_WIDTH = 8
-PAD_HEIGHT = 80
+GUTTER_WIDTH = 8
 LEFT = False
 RIGHT = True
 GREYS = ["#657382", "#708090", "#7E8D9B", "#8D99A6", "#9BA6B1", "#A9B3BC", "#B8C0C8"]
 REDS = ["#991F00", "#B22400", "#CC2900", "#E62E00", "#FF3300", "#FF4719", "#FF5C33"]
 
-PAUSE = 20
-SCORES = [0, 0]
-BALL = Ball([WIDTH / 2., HEIGHT / 2.], 20)
-PADDLE1 = Paddle([PAD_WIDTH / 2, HEIGHT / 2], PAD_HEIGHT, PAD_WIDTH, (0, HEIGHT - 1))
-PADDLE2 = Paddle([WIDTH - PAD_WIDTH / 2, HEIGHT / 2], PAD_HEIGHT, PAD_WIDTH, (0, HEIGHT - 1))
-DRAWABLE = [BALL, PADDLE1, PADDLE2]
+GAME = Game()
 
 
 def new_game():
     """Start a new game."""
-    SCORES[0] = 0
-    SCORES[1] = 0
-    BALL.reset(random.choice([LEFT, RIGHT]))
-    PADDLE1.reset()
-    PADDLE2.reset()
+    GAME.reset()
 
 
 def draw(canvas):
     """Draw handler."""
-    global PAUSE
 
     # draw mid line and gutters
     canvas.draw_line([WIDTH / 2, 0], [WIDTH / 2, HEIGHT], 1, "White")
-    canvas.draw_line([PAD_WIDTH, 0], [PAD_WIDTH, HEIGHT], 1, "White")
-    canvas.draw_line([WIDTH - PAD_WIDTH, 0], [WIDTH - PAD_WIDTH, HEIGHT], 1, "White")
+    canvas.draw_line([GUTTER_WIDTH, 0], [GUTTER_WIDTH, HEIGHT], 1, "White")
+    canvas.draw_line([WIDTH - GUTTER_WIDTH, 0], [WIDTH - GUTTER_WIDTH, HEIGHT], 1, "White")
 
-    if PAUSE > 1:
-        PAUSE -= 1
-    elif PAUSE == 1:
-        BALL.reset()
-        PAUSE -= 1
-    else:
+    if not GAME.is_paused():
         # update ball/paddles
-        for drawable in DRAWABLE:
-            drawable.move()
-
-        # check if top or bottom walls hit
-        if (BALL.get_y() <= BALL_RADIUS) or (BALL.get_y() >= HEIGHT - BALL_RADIUS - 1):
-            BALL.bounce_vertical()
-
-        # check for gutter/paddles hit
-        hit_left = BALL.get_x() <= BALL_RADIUS + PAD_WIDTH
-        hit_right = BALL.get_x() >= WIDTH - BALL_RADIUS - PAD_WIDTH - 1
-        if hit_left or hit_right:
-            if (hit_left and PADDLE1.touching_ball(BALL)) or (hit_right and PADDLE2.touching_ball(BALL)):
-                # hit the ball
-                BALL.bounce_horizontal()
-            else:
-                # missed the ball, assign a point
-                if LEFT == BALL.direction:
-                    SCORES[1] += 1
-                else:
-                    SCORES[0] += 1
-                BALL.freeze()
-                PAUSE = 20
+        GAME.move()
 
     # draw ball/paddles
-    for drawable in DRAWABLE:
-        drawable.draw(canvas)
+    GAME.draw(canvas)
 
     # draw scores
-    canvas.draw_text(str(SCORES[0]), (100, 50), 24, "white", "monospace")
-    canvas.draw_text(str(SCORES[1]), (WIDTH - 100, 50), 24, "white", "monospace")
+    canvas.draw_text(str(GAME.score[0]), (100, 50), 24, "white", "monospace")
+    canvas.draw_text(str(GAME.score[1]), (WIDTH - 100, 50), 24, "white", "monospace")
 
 
 def keydown(key):
     """Keypress handler."""
     if key == simplegui.KEY_MAP['down']:
-        PADDLE2.change_velocity(360)
+        GAME.paddle2.change_velocity(360)
     elif key == simplegui.KEY_MAP['up']:
-        PADDLE2.change_velocity(-360)
+        GAME.paddle2.change_velocity(-360)
     elif key == simplegui.KEY_MAP['s']:
-        PADDLE1.change_velocity(360)
+        GAME.paddle1.change_velocity(360)
     elif key == simplegui.KEY_MAP['w']:
-        PADDLE1.change_velocity(-360)
+        GAME.paddle1.change_velocity(-360)
 
 
 def keyup(key):
     """Keypress handler."""
     if key == simplegui.KEY_MAP['down'] or key == simplegui.KEY_MAP['up']:
-        PADDLE2.velocity = 0
+        GAME.paddle2.velocity = 0
     elif key == simplegui.KEY_MAP['s'] or key == simplegui.KEY_MAP['w']:
-        PADDLE1.velocity = 0
+        GAME.paddle1.velocity = 0
 
 
 def main():
