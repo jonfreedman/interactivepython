@@ -124,11 +124,11 @@ class Paddle(Drawable):
 
     def draw(self, canvas):
         """Draw self."""
-        x1 = self.position[0] - (self.width / 2)
-        x2 = self.position[0] + (self.width / 2)
-        y1 = self.position[1] - (self.height / 2)
-        y2 = self.position[1] + (self.height / 2)
-        canvas.draw_polygon([(x1, y1), (x1, y2), (x2, y2), (x2, y1)], 1, "white", "white")
+        _x1 = self.position[0] - (self.width / 2)
+        _x2 = self.position[0] + (self.width / 2)
+        _y1 = self.position[1] - (self.height / 2)
+        _y2 = self.position[1] + (self.height / 2)
+        canvas.draw_polygon([(_x1, _y1), (_x1, _y2), (_x2, _y2), (_x2, _y1)], 1, "white", "white")
 
 # initialize globals
 WIDTH = 600
