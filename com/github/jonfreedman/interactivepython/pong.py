@@ -28,6 +28,7 @@ class Drawable(object):
         return int(self.position[1])
 
     def reset(self):
+        """Reset to initial position."""
         self.position = list(self.initial_position)
 
 
@@ -108,11 +109,13 @@ class Paddle(Drawable):
 
     def touching_ball(self, ball):
         """Check if touching a given ball."""
-        return (ball.get_y() >= self.get_y() - (self.height / 2.)) and (ball.get_y() <= self.get_y() + (self.height / 2.) - 1)
+        return ((ball.get_y() >= self.get_y() - (self.height / 2.)) and
+                (ball.get_y() <= self.get_y() + (self.height / 2.) - 1))
 
     def __within_vertical_range(self):
         """Check within permitted vertical range."""
-        return not ((self.get_y() - (self.height / 2.) < self.vertical_range[0]) or (self.get_y() + (self.height / 2.) > self.vertical_range[1]))
+        return not ((self.get_y() - (self.height / 2.) < self.vertical_range[0]) or
+                    (self.get_y() + (self.height / 2.) > self.vertical_range[1]))
 
     def reset(self):
         """Return to original position and set velocity to zero."""
@@ -225,7 +228,7 @@ def keyup(key):
 
 def main():
     """
-    Pong
+    Pong.
 
     .. _SimpleGUICS2Pygame:
        https://simpleguics2pygame.readthedocs.org
