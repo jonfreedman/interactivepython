@@ -42,7 +42,8 @@ def test_ball_can_move():
     ball = pong.Ball([0,50], 1)
     ball.velocity = [1 * 60, 1 * 60]
     ball.move()
-    assert ball.position == [1, 51]
+    assert ball.get_x() == 1
+    assert ball.get_y() == 51
 
 def test_ball_can_freeze():
     ball = pong.Ball([0,50], 1)
@@ -65,3 +66,24 @@ def test_ball_can_bounce_horizontally_and_speeds_up():
     assert ball.velocity == [-1 * 1.1, 1]
     ball.bounce_horizontal()
     assert ball.velocity == [1 * (1.1 ** 2), 1]
+
+def test_ball_changes_direction_on_reset():
+    ball = pong.Ball([0,50], 1)
+    assert ball.direction == pong.LEFT
+    ball.reset()
+    assert ball.direction == pong.RIGHT
+
+def test_point_scoring():
+    game = pong.Game()
+    assert game.score == [0, 0]
+    game.score_point(pong.LEFT)
+    assert game.score == [1, 0]
+    game.score_point(pong.RIGHT)
+    assert game.score == [1, 1]
+
+def test_game_reset_sets_score_to_zero():
+    game = pong.Game()
+    game.score_point(pong.LEFT)
+    assert game.score == [1, 0]
+    game.reset()
+    assert game.score == [0, 0]
