@@ -1,15 +1,19 @@
 language: python
 python:
-    - "2.7"
+  - "2.7"
+  - "3.4"
 before_install:
-    - sudo apt-get update -qq
-    - sudo apt-get build-dep -qq python-pygame
-    - sudo apt-get install -qq python-pygame
+  - sudo add-apt-repository ppa:thopiekar/pygame -y
+  - sudo apt-get update -qq
+  - sudo apt-get build-dep -qq python-pygame
+  - sudo apt-get install -qq python-pygame
+  - sudo apt-get build-dep -qq pygame
+  - sudo apt-get install -qq pygame
 virtualenv:
-    system_site_packages: true
+  system_site_packages: true
 install:
-    - pip install -r requirements.txt
+  - pip install -r requirements.txt
 script:
-    - py.test --cov com/github/jonfreedman/interactivepython --cov-report term-missing
+  - py.test --cov com/github/jonfreedman/interactivepython --cov-report term-missing
 after_success:
-    - coveralls
+  - coveralls
