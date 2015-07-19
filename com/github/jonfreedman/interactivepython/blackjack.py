@@ -10,10 +10,9 @@ except ImportError:
 
 __author__ = 'jon'
 
-
 SUITS = ('C', 'S', 'H', 'D')
 RANKS = ('A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K')
-VALUES = {'A':1, '2':2, '3':3, '4':4, '5':5, '6':6, '7':7, '8':8, '9':9, 'T':10, 'J':10, 'Q':10, 'K':10}
+VALUES = {'A': 1, '2': 2, '3': 3, '4': 4, '5': 5, '6': 6, '7': 7, '8': 8, '9': 9, 'T': 10, 'J': 10, 'Q': 10, 'K': 10}
 
 
 class Card(object):
@@ -28,6 +27,7 @@ class Card(object):
         self.turned = False
 
     def __str__(self):
+        """Print suit and rank."""
         return self.suit + self.rank
 
     def get_suit(self):
@@ -44,12 +44,15 @@ class Card(object):
 
     def draw(self, canvas, pos):
         """Draw the card."""
-        card_loc = (CARD_CENTER[0] + CARD_SIZE[0] * RANKS.index(self.rank), 
-                    CARD_CENTER[1] + CARD_SIZE[1] * SUITS.index(self.suit))
+        card_loc = (
+        CARD_CENTER[0] + CARD_SIZE[0] * RANKS.index(self.rank), CARD_CENTER[1] + CARD_SIZE[1] * SUITS.index(self.suit))
         if self.turned:
-            canvas.draw_image(card_images, card_loc, CARD_SIZE, [pos[0] + CARD_CENTER[0], pos[1] + CARD_CENTER[1]], CARD_SIZE)
+            canvas.draw_image(CARD_IMAGES, card_loc, CARD_SIZE, [pos[0] + CARD_CENTER[0], pos[1] + CARD_CENTER[1]],
+                              CARD_SIZE)
         else:
-            canvas.draw_image(card_back, CARD_BACK_CENTER, CARD_SIZE, [pos[0] + CARD_CENTER[0], pos[1] + CARD_CENTER[1]], CARD_BACK_SIZE)
+            canvas.draw_image(CARD_BACK, CARD_BACK_CENTER, CARD_SIZE,
+                              [pos[0] + CARD_CENTER[0], pos[1] + CARD_CENTER[1]], CARD_BACK_SIZE)
+
 
 class Hand(object):
     """Blackjack hand of cards."""
@@ -59,6 +62,7 @@ class Hand(object):
         self.cards = []
 
     def __str__(self):
+        """Print all cards."""
         return ", ".join([str(card) for card in self.cards])
 
     def add_card(self, card):
@@ -71,7 +75,7 @@ class Hand(object):
         if "A" in [card.get_rank() for card in self.cards] and base <= 11:
             return base + 10
         return base
-   
+
     def draw(self, canvas, pos):
         """Draw a hand of cards."""
         for index, card in enumerate(self.cards):
@@ -97,6 +101,7 @@ class Deck(object):
         return card
 
     def __str__(self):
+        """Print all cards."""
         return ", ".join([str(card) for card in self.cards])
 
 
@@ -143,8 +148,8 @@ class Blackjack(object):
                 self.stand()
 
     def stand(self):
+        """Player stands, dealer plays."""
         if self.in_play:
-            """Player stands, dealer plays."""
             self.dealer.cards[0].turn()
             while self.dealer.get_value() < 17:
                 self.dealer.add_card(self.deck.deal_card(True))
@@ -175,11 +180,11 @@ class Blackjack(object):
 
 CARD_SIZE = (72, 96)
 CARD_CENTER = (36, 48)
-card_images = simplegui.load_image("http://storage.googleapis.com/codeskulptor-assets/cards_jfitz.png")
+CARD_IMAGES = simplegui.load_image("http://storage.googleapis.com/codeskulptor-assets/cards_jfitz.png")
 
 CARD_BACK_SIZE = (72, 96)
 CARD_BACK_CENTER = (36, 48)
-card_back = simplegui.load_image("http://storage.googleapis.com/codeskulptor-assets/card_jfitz_back.png")
+CARD_BACK = simplegui.load_image("http://storage.googleapis.com/codeskulptor-assets/card_jfitz_back.png")
 
 GAME = Blackjack()
 
@@ -197,7 +202,7 @@ def main():
     frame.add_button("Deal", GAME.deal, 200)
     frame.add_button("Hit", GAME.hit, 200)
     frame.add_button("Stand", GAME.stand, 200)
-    frame.set_draw_handler(lambda canvas: GAME.draw(canvas))
+    frame.set_draw_handler(GAME.draw)
 
     frame.start()
 
