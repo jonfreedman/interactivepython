@@ -67,6 +67,7 @@ class Game(object):
                 self.state = 2
                 self.card2 = self.deck[index]
                 self.card2.turn()
+                self.take_turn()
             else:
                 # click with two cards turned
                 self.state = 1
@@ -74,7 +75,6 @@ class Game(object):
                     # not matched
                     self.card1.turn()
                     self.card2.turn()
-                self.take_turn()
                 self.card1 = self.deck[index]
                 self.card2 = None
                 self.card1.turn()
