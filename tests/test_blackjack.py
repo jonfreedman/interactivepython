@@ -20,13 +20,18 @@ def test_hand_can_have_cards_added_and_keeps_score():
 
 def test_deck_has_cards():
     deck = blackjack.Deck()
-    card = deck.deal_card()
+    card = deck.deal_card(True)
     assert card is not None
 
 def test_deck_can_be_shuffled():
     deck = blackjack.Deck()
-    card = deck.deal_card()
+    card = deck.deal_card(True)
     assert card is not None
+
+def test_deck_can_deal_cards_face_up_or_down():
+    deck = blackjack.Deck()
+    assert deck.deal_card(True).turned
+    assert not deck.deal_card(False).turned
 
 def test_hands_are_dealt():
     game = blackjack.Blackjack()
@@ -41,7 +46,6 @@ def test_hands_are_dealt():
 
 def test_dealing_in_game_loses():
     game = blackjack.Blackjack()
-    game.deal()
     assert game.score == 0
     game.deal()
     assert game.score == -1
