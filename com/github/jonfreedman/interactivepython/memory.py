@@ -25,15 +25,15 @@ class Card(object):
 
     def draw(self, canvas, x_offset):
         """Draw the card."""
-        x1 = x_offset + 2
-        x2 = x_offset + CARD_WIDTH - 2
-        y1 = 2
-        y2 = CANVAS_HEIGHT - 2
+        _x1 = x_offset + 2
+        _x2 = x_offset + CARD_WIDTH - 2
+        _y1 = 2
+        _y2 = CANVAS_HEIGHT - 2
         if self.visible:
-            canvas.draw_polygon([(x1, y1), (x1, y2), (x2, y2), (x2, y1)], 2, 'Green')
+            canvas.draw_polygon([(_x1, _y1), (_x1, _y2), (_x2, _y2), (_x2, _y1)], 2, 'Green')
             canvas.draw_text(str(self.value), [x_offset + 10, CANVAS_HEIGHT - 30], 64, 'White')
         else:
-            canvas.draw_polygon([(x1, y1), (x1, y2), (x2, y2), (x2, y1)], 2, 'Green', 'Green')
+            canvas.draw_polygon([(_x1, _y1), (_x1, _y2), (_x2, _y2), (_x2, _y1)], 2, 'Green', 'Green')
 
 
 class Game(object):
@@ -78,7 +78,6 @@ class Game(object):
                 self.card1 = self.deck[index]
                 self.card2 = None
                 self.card1.turn()
-
 
     def take_turn(self):
         """Record turn taken."""
