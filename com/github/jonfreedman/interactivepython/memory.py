@@ -15,23 +15,32 @@ class Card(object):
     """Single card in the game."""
 
     def __init__(self, value):
+        """New card."""
         self.value = value
         self.visible = False
 
     def turn(self):
+        """Turn over the card."""
         self.visible = not self.visible
 
     def draw(self, canvas, x_offset):
+        """Draw the card."""
+        x1 = x_offset + 2
+        x2 = x_offset + CARD_WIDTH - 2
+        y1 = 2
+        y2 = CANVAS_HEIGHT - 2
         if self.visible:
-            canvas.draw_polygon([(x_offset + 2, 2), (x_offset + 2, CANVAS_HEIGHT - 2), (x_offset + CARD_WIDTH - 2, CANVAS_HEIGHT - 2), (x_offset + CARD_WIDTH - 2, 2)], 2, 'Green')
+            canvas.draw_polygon([(x1, y1), (x1, y2), (x2, y2), (x2, y1)], 2, 'Green')
             canvas.draw_text(str(self.value), [x_offset + 10, CANVAS_HEIGHT - 30], 64, 'White')
         else:
-            canvas.draw_polygon([(x_offset + 2, 2), (x_offset + 2, CANVAS_HEIGHT - 2), (x_offset + CARD_WIDTH - 2, CANVAS_HEIGHT - 2), (x_offset + CARD_WIDTH - 2, 2)], 2, 'Green', 'Green')
+            canvas.draw_polygon([(x1, y1), (x1, y2), (x2, y2), (x2, y1)], 2, 'Green', 'Green')
+
 
 class Game(object):
     """Memory game state."""
 
     def __init__(self, label=None):
+        """Start a new game."""
         self.deck = [Card(i) for i in list(range(8)) * 2]
         random.shuffle(self.deck)
         self.turns = 0
@@ -43,6 +52,7 @@ class Game(object):
             self.label.set_text("Turns = 0")
 
     def user_click(self, index):
+        """Handle user click on a card."""
         if self.deck[index].visible:
             # clicked an already visible card, do nothing
             pass
@@ -71,6 +81,7 @@ class Game(object):
 
 
     def take_turn(self):
+        """Record turn taken."""
         self.turns += 1
         self.label.set_text("Turns = " + str(self.turns))
 
