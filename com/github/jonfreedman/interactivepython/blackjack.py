@@ -44,8 +44,8 @@ class Card(object):
 
     def draw(self, canvas, pos):
         """Draw the card."""
-        card_loc = (
-        CARD_CENTER[0] + CARD_SIZE[0] * RANKS.index(self.rank), CARD_CENTER[1] + CARD_SIZE[1] * SUITS.index(self.suit))
+        card_loc = (CARD_CENTER[0] + CARD_SIZE[0] * RANKS.index(self.rank),
+                    CARD_CENTER[1] + CARD_SIZE[1] * SUITS.index(self.suit))
         if self.turned:
             canvas.draw_image(CARD_IMAGES, card_loc, CARD_SIZE, [pos[0] + CARD_CENTER[0], pos[1] + CARD_CENTER[1]],
                               CARD_SIZE)
