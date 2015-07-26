@@ -46,6 +46,6 @@ def test_hands_are_dealt():
 
 def test_dealing_in_game_loses():
     game = blackjack.Blackjack()
-    assert game.score == 0
+    game.in_play = True
     game.deal()
     assert game.score == -1

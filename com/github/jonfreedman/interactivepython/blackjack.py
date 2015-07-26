@@ -116,7 +116,6 @@ class Blackjack(object):
         self.in_play = False
         self.score = 0
         self.message = ""
-        self.deal()
 
     def deal(self):
         """Deal a fresh hand."""
