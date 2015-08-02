@@ -14,9 +14,6 @@ __author__ = 'jon'
 # globals for user interface
 WIDTH = 800
 HEIGHT = 600
-score = 0
-lives = 3
-time = 0
 
 
 class ImageInfo:
@@ -92,6 +89,114 @@ def dist(p, q):
     return math.sqrt((p[0] - q[0]) ** 2 + (p[1] - q[1]) ** 2)
 
 
+class Game(object):
+    """Game object."""
+
+    def __init__(self, ship, max_rocks):
+        """Initialise the game with a single ship."""
+        self.ship = ship
+        self.max_rocks = max_rocks
+        self.rocks = set()
+        self.missiles = set()
+        self.score = 0
+        self.lives = 3
+        self.time = 0
+        self.started = False
+
+    def start(self):
+        self.started = True
+        soundtrack.play()
+
+    def restart(self):
+        self.rocks = set()
+        self.missiles = set()
+        self.score = 0
+        self.lives = 3
+        self.started = False
+        soundtrack.rewind()
+
+    def rock_spawner(self):
+        """Timer handler that spawns a rock."""
+        if self.started and len(self.rocks) < self.max_rocks:
+            pos = (random.randrange(WIDTH), random.randrange(HEIGHT))
+            if dist(self.ship.get_position(), pos) > (self.ship.get_radius() + asteroid_info.get_radius() + 50):
+                vel = (random.randrange(100) / 100., random.randrange(100) / 100.)
+                angle_vel = random.choice([.05, -.05])
+                self.rocks.add(Sprite(pos, vel, 0, angle_vel, asteroid_image, asteroid_info))
+
+    def click(self, pos):
+        """Mouseclick handler."""
+        center = [WIDTH / 2, HEIGHT / 2]
+        size = splash_info.get_size()
+        inwidth = (center[0] - size[0] / 2) < pos[0] < (center[0] + size[0] / 2)
+        inheight = (center[1] - size[1] / 2) < pos[1] < (center[1] + size[1] / 2)
+        if (not self.started) and inwidth and inheight:
+            self.start()
+
+    def draw(self, canvas):
+        """Draw handler."""
+
+        # animate background
+        self.time += 1
+        wtime = (self.time / 4) % WIDTH
+        center = debris_info.get_center()
+        size = debris_info.get_size()
+        canvas.draw_image(nebula_image, nebula_info.get_center(), nebula_info.get_size(), [WIDTH / 2, HEIGHT / 2], [WIDTH, HEIGHT])
+        canvas.draw_image(debris_image, center, size, (wtime - WIDTH / 2, HEIGHT / 2), (WIDTH, HEIGHT))
+        canvas.draw_image(debris_image, center, size, (wtime + WIDTH / 2, HEIGHT / 2), (WIDTH, HEIGHT))
+
+        canvas.draw_text("Score " + str(self.score) + " Lives " + str(self.lives), (10, 34), 24, "blue", "sans-serif")
+
+        # draw ship and sprites
+        self.ship.draw(canvas)
+        self._draw_sprite_group(self.rocks, canvas)
+        self._draw_sprite_group(self.missiles, canvas)
+
+        # update ship and sprites
+        self.ship.update()
+
+        # process state
+        self.score += self._process_missile_collisions()
+
+        if self._process_rock_collisions():
+            self.lives -= 1
+            self.score -= 1
+
+        if self.lives == 0:
+            self.restart()
+
+        if not self.started:
+            canvas.draw_image(splash_image, splash_info.get_center(), splash_info.get_size(), [WIDTH / 2, HEIGHT / 2], splash_info.get_size())
+
+    def _draw_sprite_group(self, sprites, canvas):
+        elapsed_lifetimes = set()
+        for sprite in sprites:
+            sprite.draw(canvas)
+            if not sprite.update():
+                elapsed_lifetimes.add(sprite)
+        sprites.difference_update(elapsed_lifetimes)
+
+    def _process_rock_collisions(self):
+        rock_collisions = set()
+        for rock in self.rocks:
+            if self.ship.collide(rock):
+                rock_collisions.add(rock)
+        self.rocks.difference_update(rock_collisions)
+        return len(rock_collisions) > 0
+
+    def _process_missile_collisions(self):
+        rock_collisions = set()
+        missile_collisions = set()
+        for missile in self.missiles:
+            for rock in self.rocks:
+                if missile.collide(rock):
+                    rock_collisions.add(rock)
+                    missile_collisions.add(missile)
+        self.rocks.difference_update(rock_collisions)
+        self.missiles.difference_update(missile_collisions)
+        return len(rock_collisions)
+
+
 class Ship(object):
     """Ship class."""
 
@@ -122,11 +227,19 @@ class Ship(object):
 
     def shoot(self):
         """Shoot a missile."""
-        global a_missile
         vector = angle_to_vector(self.angle)
-        cannon_pos = (self.pos[0] + (vector[0] * 40), self.pos[1] + (vector[1] * 40))
-        missile_vel = (self.vel[0] + (vector[0] * 2), self.vel[1] + (vector[1] * 2))
-        a_missile = Sprite(cannon_pos, missile_vel, self.angle, 0, missile_image, missile_info, missile_sound)
+        cannon_pos = (self.pos[0] + (vector[0] * self.radius), self.pos[1] + (vector[1] * self.radius))
+        missile_vel = (self.vel[0] + (vector[0] * 6), self.vel[1] + (vector[1] * 6))
+        return Sprite(cannon_pos, missile_vel, self.angle, 0, missile_image, missile_info, missile_sound)
+
+    def get_position(self):
+        return self.pos
+
+    def get_radius(self):
+        return self.radius
+
+    def collide(self, other):
+        return dist(self.get_position(), other.get_position()) < (self.get_radius() + other.get_radius())
 
     def draw(self, canvas):
         """Draw the ship."""
@@ -176,6 +289,15 @@ class Sprite:
             sound.rewind()
             sound.play()
 
+    def get_position(self):
+        return self.pos
+
+    def get_radius(self):
+        return self.radius
+
+    def collide(self, other):
+        return dist(self.get_position(), other.get_position()) < (self.get_radius() + other.get_radius())
+
     def draw(self, canvas):
         """Draw the sprite."""
         canvas.draw_image(self.image, self.image_center, self.image_size, self.pos, self.image_size, self.angle)
@@ -191,66 +313,32 @@ class Sprite:
         # rotate
         self.angle += self.angle_vel
 
-
-def draw(canvas):
-    """Draw handler."""
-    global time
-
-    # animate background
-    time += 1
-    wtime = (time / 4) % WIDTH
-    center = debris_info.get_center()
-    size = debris_info.get_size()
-    canvas.draw_image(nebula_image, nebula_info.get_center(), nebula_info.get_size(), [WIDTH / 2, HEIGHT / 2], [WIDTH, HEIGHT])
-    canvas.draw_image(debris_image, center, size, (wtime - WIDTH / 2, HEIGHT / 2), (WIDTH, HEIGHT))
-    canvas.draw_image(debris_image, center, size, (wtime + WIDTH / 2, HEIGHT / 2), (WIDTH, HEIGHT))
-
-    canvas.draw_text("Score " + str(score) + " Lives " + str(lives), (10, 34), 24, "blue", "sans-serif")
-
-    # draw ship and sprites
-    my_ship.draw(canvas)
-    a_rock.draw(canvas)
-    a_missile.draw(canvas)
-
-    # update ship and sprites
-    my_ship.update()
-    a_rock.update()
-    a_missile.update()
+        self.age += 1
+        return self.age < self.lifespan
 
 
 def keydown(key):
     """Keypress handler."""
     if key == simplegui.KEY_MAP['left']:
-        my_ship.set_angle_vel(-.05)
+        GAME.ship.set_angle_vel(-.05)
     elif key == simplegui.KEY_MAP['right']:
-        my_ship.set_angle_vel(.05)
+        GAME.ship.set_angle_vel(.05)
     elif key == simplegui.KEY_MAP['up']:
-        my_ship.set_thrust(True)
+        GAME.ship.set_thrust(True)
     elif key == simplegui.KEY_MAP['space']:
-        my_ship.shoot()
+        GAME.missiles.add(GAME.ship.shoot())
 
 
 def keyup(key):
     """Keypress handler."""
     if key == simplegui.KEY_MAP['left'] or key == simplegui.KEY_MAP['right']:
-        my_ship.set_angle_vel(0)
+        GAME.ship.set_angle_vel(0)
     elif key == simplegui.KEY_MAP['up']:
-        my_ship.set_thrust(False)
+        GAME.ship.set_thrust(False)
 
-
-def rock_spawner():
-    """Timer handler that spawns a rock."""
-    global a_rock
-    pos = (random.randrange(WIDTH), random.randrange(HEIGHT))
-    vel = (random.randrange(100) / 100., random.randrange(100) / 100.)
-    angle_vel = random.choice([.05, -.05])
-    a_rock = Sprite(pos, vel, 0, angle_vel, asteroid_image, asteroid_info)
 
 # initialize ship and two sprites
-my_ship = Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info, ship_thrust_sound)
-a_rock = Sprite([WIDTH / 3, HEIGHT / 3], [1, 1], 0, 0, asteroid_image, asteroid_info)
-a_missile = Sprite([2 * WIDTH / 3, 2 * HEIGHT / 3], [-1, 1], 0, 0, missile_image, missile_info, missile_sound)
-
+GAME = Game(Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info, ship_thrust_sound), 12)
 
 def main():
     """
@@ -261,11 +349,12 @@ def main():
     """
     frame = simplegui.create_frame("Asteroids", WIDTH, HEIGHT)
 
-    frame.set_draw_handler(draw)
+    frame.set_draw_handler(GAME.draw)
     frame.set_keydown_handler(keydown)
     frame.set_keyup_handler(keyup)
+    frame.set_mouseclick_handler(GAME.click)
 
-    timer = simplegui.create_timer(1000.0, rock_spawner)
+    timer = simplegui.create_timer(1000.0, GAME.rock_spawner)
 
     timer.start()
     frame.start()
