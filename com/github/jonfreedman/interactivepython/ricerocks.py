@@ -16,7 +16,7 @@ WIDTH = 800
 HEIGHT = 600
 
 
-class ImageInfo:
+class ImageInfo(object):
     """Util class to store image information."""
 
     def __init__(self, center, size, radius=0, lifespan=None, animated=False):
@@ -167,7 +167,6 @@ class Game(object):
 
     def draw(self, canvas):
         """Draw handler."""
-
         # animate background
         self.time += 1
         wtime = (self.time / 4) % WIDTH
@@ -216,7 +215,7 @@ class Game(object):
         for rock in self.rocks:
             if entity.collide(rock):
                 self.rocks.remove(rock)
-                self.explosions.add(Sprite(rock.get_position(), [0,0], 0, 0, explosion_image, explosion_info, explosion_sound))
+                self.explosions.add(Sprite(rock.get_position(), [0, 0], 0, 0, explosion_image, explosion_info, explosion_sound))
                 return True
         return False
 
@@ -270,11 +269,11 @@ class Ship(object):
         return Sprite(cannon_pos, missile_vel, self.angle, 0, missile_image, missile_info, missile_sound)
 
     def get_position(self):
-        """Ships position."""
+        """Ship position."""
         return self.pos
 
     def get_radius(self):
-        """Ships radius."""
+        """Ship radius."""
         return self.radius
 
     def collide(self, other):
@@ -309,7 +308,7 @@ class Ship(object):
             self.vel[1] += forward_vector[1] * .1
 
 
-class Sprite:
+class Sprite(object):
     """Sprite class."""
 
     def __init__(self, pos, vel, ang, ang_vel, image, info, sound=None):
@@ -330,11 +329,11 @@ class Sprite:
             sound.play()
 
     def get_position(self):
-        """Sprites position."""
+        """Sprite position."""
         return self.pos
 
     def get_radius(self):
-        """Sprites radius."""
+        """Sprite radius."""
         return self.radius
 
     def collide(self, other):
@@ -362,11 +361,10 @@ class Sprite:
         self.age += 1
         return self.age < self.lifespan
 
+GAME = Game(Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info, ship_thrust_sound,
+             simplegui.KEY_MAP['right'], simplegui.KEY_MAP['left'], simplegui.KEY_MAP['up'], simplegui.KEY_MAP['space']),
+            12)
 
-# initialize ship and two sprites
-ship1 = Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info, ship_thrust_sound,
-             simplegui.KEY_MAP['right'], simplegui.KEY_MAP['left'], simplegui.KEY_MAP['up'], simplegui.KEY_MAP['space'])
-GAME = Game(ship1, 12)
 
 def main():
     """
