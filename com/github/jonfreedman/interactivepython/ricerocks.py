@@ -17,7 +17,10 @@ HEIGHT = 600
 
 
 class ImageInfo:
+    """Util class to store image information."""
+
     def __init__(self, center, size, radius=0, lifespan=None, animated=False):
+        """Initialise an image, by default zero radius, non-animated with no lifespan."""
         self.center = center
         self.size = size
         self.radius = radius
@@ -28,18 +31,23 @@ class ImageInfo:
         self.animated = animated
 
     def get_center(self):
+        """Pixel co-ordinates for center of image."""
         return self.center
 
     def get_size(self):
+        """Pixel width and height of image."""
         return self.size
 
     def get_radius(self):
+        """Pixel radius of image."""
         return self.radius
 
     def get_lifespan(self):
+        """Frame lifespace of image."""
         return self.lifespan
 
     def get_animated(self):
+        """True if image is animated."""
         return self.animated
 
 # art assets created by Kim Lathrop, may be freely re-used in non-commercial projects, please credit Kim
@@ -98,20 +106,26 @@ class Game(object):
         self.max_rocks = max_rocks
         self.rocks = set()
         self.missiles = set()
+        self.explosions = set()
         self.score = 0
         self.lives = 3
         self.time = 0
         self.started = False
 
     def start(self):
+        """Start the game."""
+        self.score = 0
+        self.lives = 3
+        self.time = 0
         self.started = True
         soundtrack.play()
 
     def restart(self):
+        """Restart the game."""
+        self.ship.set_thrust(False)
         self.rocks = set()
         self.missiles = set()
-        self.score = 0
-        self.lives = 3
+        self.explosions = set()
         self.started = False
         soundtrack.rewind()
 
@@ -123,6 +137,24 @@ class Game(object):
                 vel = (random.randrange(100) / 100., random.randrange(100) / 100.)
                 angle_vel = random.choice([.05, -.05])
                 self.rocks.add(Sprite(pos, vel, 0, angle_vel, asteroid_image, asteroid_info))
+
+    def keydown(self, key):
+        """Keypress handler."""
+        if key == self.ship.turn_clockwise_key:
+            self.ship.set_angle_vel(.05)
+        elif key == self.ship.turn_counterclockwise_key:
+            self.ship.set_angle_vel(-.05)
+        elif key == self.ship.thrust_key:
+            self.ship.set_thrust(True)
+        elif key == self.ship.shoot_key:
+            self.missiles.add(GAME.ship.shoot())
+
+    def keyup(self, key):
+        """Keypress handler."""
+        if key == self.ship.turn_clockwise_key or key == self.ship.turn_counterclockwise_key:
+            self.ship.set_angle_vel(0)
+        elif key == self.ship.thrust_key:
+            self.ship.set_thrust(False)
 
     def click(self, pos):
         """Mouseclick handler."""
@@ -151,6 +183,7 @@ class Game(object):
         self.ship.draw(canvas)
         self._draw_sprite_group(self.rocks, canvas)
         self._draw_sprite_group(self.missiles, canvas)
+        self._draw_sprite_group(self.explosions, canvas)
 
         # update ship and sprites
         self.ship.update()
@@ -158,7 +191,7 @@ class Game(object):
         # process state
         self.score += self._process_missile_collisions()
 
-        if self._process_rock_collisions():
+        if self._process_rock_collisions(self.ship):
             self.lives -= 1
             self.score -= 1
 
@@ -166,9 +199,11 @@ class Game(object):
             self.restart()
 
         if not self.started:
-            canvas.draw_image(splash_image, splash_info.get_center(), splash_info.get_size(), [WIDTH / 2, HEIGHT / 2], splash_info.get_size())
+            canvas.draw_image(splash_image, splash_info.get_center(), splash_info.get_size(), [WIDTH / 2, HEIGHT / 2],
+                              splash_info.get_size())
 
     def _draw_sprite_group(self, sprites, canvas):
+        """Draw a set of sprites and remove any which have elapsed their lifetime."""
         elapsed_lifetimes = set()
         for sprite in sprites:
             sprite.draw(canvas)
@@ -176,31 +211,29 @@ class Game(object):
                 elapsed_lifetimes.add(sprite)
         sprites.difference_update(elapsed_lifetimes)
 
-    def _process_rock_collisions(self):
-        rock_collisions = set()
+    def _process_rock_collisions(self, entity):
+        """Check for collisions, entity can only destroy a single rock."""
         for rock in self.rocks:
-            if self.ship.collide(rock):
-                rock_collisions.add(rock)
-        self.rocks.difference_update(rock_collisions)
-        return len(rock_collisions) > 0
+            if entity.collide(rock):
+                self.rocks.remove(rock)
+                self.explosions.add(Sprite(rock.get_position(), [0,0], 0, 0, explosion_image, explosion_info, explosion_sound))
+                return True
+        return False
 
     def _process_missile_collisions(self):
-        rock_collisions = set()
+        """Check for collisions, a missile can only destroy a single rock."""
         missile_collisions = set()
         for missile in self.missiles:
-            for rock in self.rocks:
-                if missile.collide(rock):
-                    rock_collisions.add(rock)
-                    missile_collisions.add(missile)
-        self.rocks.difference_update(rock_collisions)
+            if self._process_rock_collisions(missile):
+                missile_collisions.add(missile)
         self.missiles.difference_update(missile_collisions)
-        return len(rock_collisions)
+        return len(missile_collisions)
 
 
 class Ship(object):
     """Ship class."""
 
-    def __init__(self, pos, vel, angle, image, info, thrust_sound):
+    def __init__(self, pos, vel, angle, image, info, thrust_sound, turn_clockwise_key, turn_counterclockwise_key, thrust_key, shoot_key):
         """Spawn a ship."""
         self.pos = [pos[0], pos[1]]
         self.vel = [vel[0], vel[1]]
@@ -212,6 +245,10 @@ class Ship(object):
         self.image_size = info.get_size()
         self.radius = info.get_radius()
         self.thrust_sound = thrust_sound
+        self.turn_clockwise_key = turn_clockwise_key
+        self.turn_counterclockwise_key = turn_counterclockwise_key
+        self.thrust_key = thrust_key
+        self.shoot_key = shoot_key
 
     def set_angle_vel(self, angle):
         """Set the angle velocity of the ship to control rotation."""
@@ -233,12 +270,15 @@ class Ship(object):
         return Sprite(cannon_pos, missile_vel, self.angle, 0, missile_image, missile_info, missile_sound)
 
     def get_position(self):
+        """Ships position."""
         return self.pos
 
     def get_radius(self):
+        """Ships radius."""
         return self.radius
 
     def collide(self, other):
+        """True if the ship has collided with another object."""
         return dist(self.get_position(), other.get_position()) < (self.get_radius() + other.get_radius())
 
     def draw(self, canvas):
@@ -290,17 +330,23 @@ class Sprite:
             sound.play()
 
     def get_position(self):
+        """Sprites position."""
         return self.pos
 
     def get_radius(self):
+        """Sprites radius."""
         return self.radius
 
     def collide(self, other):
+        """True if the ship has collided with another object."""
         return dist(self.get_position(), other.get_position()) < (self.get_radius() + other.get_radius())
 
     def draw(self, canvas):
         """Draw the sprite."""
-        canvas.draw_image(self.image, self.image_center, self.image_size, self.pos, self.image_size, self.angle)
+        draw_center = self.image_center
+        if self.animated:
+            draw_center = (self.image_center[0] + (self.image_size[0] * self.age), self.image_center[1])
+        canvas.draw_image(self.image, draw_center, self.image_size, self.pos, self.image_size, self.angle)
 
     def update(self):
         """Update sprite's state."""
@@ -317,28 +363,10 @@ class Sprite:
         return self.age < self.lifespan
 
 
-def keydown(key):
-    """Keypress handler."""
-    if key == simplegui.KEY_MAP['left']:
-        GAME.ship.set_angle_vel(-.05)
-    elif key == simplegui.KEY_MAP['right']:
-        GAME.ship.set_angle_vel(.05)
-    elif key == simplegui.KEY_MAP['up']:
-        GAME.ship.set_thrust(True)
-    elif key == simplegui.KEY_MAP['space']:
-        GAME.missiles.add(GAME.ship.shoot())
-
-
-def keyup(key):
-    """Keypress handler."""
-    if key == simplegui.KEY_MAP['left'] or key == simplegui.KEY_MAP['right']:
-        GAME.ship.set_angle_vel(0)
-    elif key == simplegui.KEY_MAP['up']:
-        GAME.ship.set_thrust(False)
-
-
 # initialize ship and two sprites
-GAME = Game(Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info, ship_thrust_sound), 12)
+ship1 = Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info, ship_thrust_sound,
+             simplegui.KEY_MAP['right'], simplegui.KEY_MAP['left'], simplegui.KEY_MAP['up'], simplegui.KEY_MAP['space'])
+GAME = Game(ship1, 12)
 
 def main():
     """
@@ -350,8 +378,8 @@ def main():
     frame = simplegui.create_frame("Asteroids", WIDTH, HEIGHT)
 
     frame.set_draw_handler(GAME.draw)
-    frame.set_keydown_handler(keydown)
-    frame.set_keyup_handler(keyup)
+    frame.set_keydown_handler(GAME.keydown)
+    frame.set_keyup_handler(GAME.keyup)
     frame.set_mouseclick_handler(GAME.click)
 
     timer = simplegui.create_timer(1000.0, GAME.rock_spawner)
